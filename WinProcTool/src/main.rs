@@ -2,7 +2,7 @@ use std::ffi::OsStr;
 use std::io::{self, Write};
 use std::os::windows::ffi::OsStrExt;
 use std::ptr::null_mut;
-use windows::Win32::Foundation::{CloseHandle, BOOL};
+use windows::Win32::Foundation::{CloseHandle, BOOL, GetLastError};
 use windows::Win32::System::Threading::{
     CreateProcessW, OpenProcess, ResumeThread, SuspendThread, TerminateProcess, PROCESS_INFORMATION,
     STARTUPINFOW, PROCESS_ALL_ACCESS, PROCESS_CREATION_FLAGS,
@@ -19,11 +19,12 @@ fn to_pcwstr(s: &str) -> PCWSTR {
 fn create_process(app_name: &str) -> Option<PROCESS_INFORMATION> {
     let mut si = STARTUPINFOW::default();
     let mut pi = PROCESS_INFORMATION::default();
+    let app_path = to_pcwstr(app_name);
 
     let result: BOOL = unsafe {
         CreateProcessW(
-            to_pcwstr(app_name),
-            PWSTR(null_mut()),
+            app_path,
+            PWSTR(app_path.0 as *mut u16), // Use app_path for lpCommandLine
             None,
             None,
             false,
@@ -39,7 +40,8 @@ fn create_process(app_name: &str) -> Option<PROCESS_INFORMATION> {
         println!("Process created successfully. PID: {}", pi.dwProcessId);
         Some(pi)
     } else {
-        println!("Failed to create process.");
+        let error_code = unsafe { GetLastError().0 };
+        println!("Failed to create process. Error code: {}", error_code);
         None
     }
 }
