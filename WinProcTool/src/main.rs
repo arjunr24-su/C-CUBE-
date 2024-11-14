@@ -15,7 +15,7 @@ fn to_pcwstr(s: &str) -> PCWSTR {
     PCWSTR::from_raw(wide.as_ptr())
 }
 
-// Function to create a process
+//  create 
 fn create_process(app_name: &str) -> Option<PROCESS_INFORMATION> {
     let mut si = STARTUPINFOW::default();
     let mut pi = PROCESS_INFORMATION::default();
@@ -24,7 +24,7 @@ fn create_process(app_name: &str) -> Option<PROCESS_INFORMATION> {
     let result: BOOL = unsafe {
         CreateProcessW(
             app_path,
-            PWSTR(app_path.0 as *mut u16), // Use app_path for lpCommandLine
+            PWSTR(app_path.0 as *mut u16),
             None,
             None,
             false,
@@ -46,7 +46,7 @@ fn create_process(app_name: &str) -> Option<PROCESS_INFORMATION> {
     }
 }
 
-// Function to terminate a process by PID
+//  terminate 
 fn terminate_process(pid: u32) -> bool {
     let handle = unsafe { OpenProcess(PROCESS_ALL_ACCESS, false, pid).expect("Failed to open process") };
     if handle.is_invalid() {
@@ -59,7 +59,7 @@ fn terminate_process(pid: u32) -> bool {
     result.as_bool()
 }
 
-// Function to suspend a process by PID
+//  suspend 
 fn suspend_process(pid: u32) -> bool {
     let handle = unsafe { OpenProcess(PROCESS_ALL_ACCESS, false, pid).expect("Failed to open process") };
     if handle.is_invalid() {
@@ -72,7 +72,7 @@ fn suspend_process(pid: u32) -> bool {
     result != u32::MAX
 }
 
-// Function to resume a process by PID
+//  resume 
 fn resume_process(pid: u32) -> bool {
     let handle = unsafe { OpenProcess(PROCESS_ALL_ACCESS, false, pid).expect("Failed to open process") };
     if handle.is_invalid() {
